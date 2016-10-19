@@ -903,7 +903,7 @@ class InternalDataFacade final : public BaseDataFacade
 
     double GetMapMatchingMaxSpeed() const override final
     {
-        return m_profile_properties->max_speed_for_map_matching;
+        return m_profile_properties.max_speed_for_map_matching;
     }
 
     BearingClassID GetBearingClassID(const NodeID nid) const override final

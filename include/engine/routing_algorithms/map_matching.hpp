@@ -7,6 +7,7 @@
 #include "engine/map_matching/matching_confidence.hpp"
 #include "engine/map_matching/sub_matching.hpp"
 
+#include "extractor/profile_properties.hpp"
 #include "util/coordinate_calculation.hpp"
 #include "util/for_each_pair.hpp"
 
@@ -46,6 +47,7 @@ class MapMatching final : public BasicRoutingInterface<DataFacadeT, MapMatching<
     map_matching::EmissionLogProbability default_emission_log_probability;
     map_matching::TransitionLogProbability transition_log_probability;
     map_matching::MatchingConfidence confidence;
+    extractor::ProfileProperties m_profile_properties;
 
     unsigned GetMedianSampleTime(const std::vector<unsigned> &timestamps) const
     {
@@ -98,7 +100,7 @@ class MapMatching final : public BasicRoutingInterface<DataFacadeT, MapMatching<
         const auto max_distance_delta = [&] {
             if (use_timestamps)
             {
-                return median_sample_time * MAX_SPEED;
+                return median_sample_time * facade.GetMapMatchingMaxSpeed();
             }
             else
             {

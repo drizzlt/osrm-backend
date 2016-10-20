@@ -11,7 +11,7 @@ namespace extractor
 struct ProfileProperties
 {
     ProfileProperties()
-        : traffic_signal_penalty(0), u_turn_penalty(0), max_speed_for_map_matching(0),
+        : traffic_signal_penalty(0), u_turn_penalty(0), max_speed_for_map_matching(180/3.6),
         continue_straight_at_waypoint(true), use_turn_restrictions(false), left_hand_driving(false)
     {
     }

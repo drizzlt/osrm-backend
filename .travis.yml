@@ -33,6 +33,14 @@ matrix:
   # We override the compiler names here to yield better ccache behavior, which uses this as key
   include:
 
+    - os: linux
+      compiler: "mason-debug"
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['libstdc++-5-dev', 'libgdal-dev', 'ccache']
+      env: CLANG_VERSION='3.9.0' CLANG_PACKAGE="llvm" BUILD_TYPE='Debug' CMAKE_ARGS="-DENABLE_MASON=ON"
+
     # Debug Builds
     - os: linux
       compiler: "gcc-6-debug"
@@ -48,7 +56,7 @@ matrix:
         apt:
           sources: ['ubuntu-toolchain-r-test']
           packages: ['libstdc++-5-dev', 'libbz2-dev', 'libstxxl-dev', 'libstxxl1', 'libxml2-dev', 'libzip-dev', 'lua5.1', 'liblua5.1-0-dev', 'libtbb-dev', 'libgdal-dev', 'libluabind-dev', 'libboost-all-dev', 'ccache']
-      env: CLANG_VERSION='3.8.0' BUILD_TYPE='Debug' RUN_CLANG_FORMAT=ON
+      env: CLANG_VERSION='3.8.0' CLANG_PACKAGE="clang" BUILD_TYPE='Debug' RUN_CLANG_FORMAT=ON
 
     - os: osx
       osx_image: xcode7.3
@@ -114,7 +122,7 @@ before_install:
     if [[ ${CLANG_VERSION:-false} != false ]]; then
       export CCOMPILER='clang'
       export CXXCOMPILER='clang++'
-      CLANG_URL="https://mason-binaries.s3.amazonaws.com/${TRAVIS_OS_NAME}-x86_64/clang/${CLANG_VERSION}.tar.gz"
+      CLANG_URL="https://mason-binaries.s3.amazonaws.com/${TRAVIS_OS_NAME}-x86_64/${CLANG_PACKAGE}/${CLANG_VERSION}.tar.gz"
       travis_retry wget --quiet -O - ${CLANG_URL} | tar --strip-components=1 -xz -C ${DEPS_DIR} || exit 1
     fi
   - |
@@ -131,7 +139,7 @@ install:
     fi
   - mkdir build && pushd build
   - export CC=${CCOMPILER} CXX=${CXXCOMPILER}
-  - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS:-OFF} -DENABLE_COVERAGE=${ENABLE_COVERAGE:-OFF} -DENABLE_SANITIZER=${ENABLE_SANITIZER:-OFF} -DBUILD_TOOLS=ON -DBUILD_COMPONENTS=ON -DENABLE_CCACHE=ON
+  - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${CMAKE_ARGS} -DBUILD_SHARED_LIBS=${BUILD_SHARED_LIBS:-OFF} -DENABLE_COVERAGE=${ENABLE_COVERAGE:-OFF} -DENABLE_SANITIZER=${ENABLE_SANITIZER:-OFF} -DBUILD_TOOLS=ON -DBUILD_COMPONENTS=ON -DENABLE_CCACHE=ON
   - echo "travis_fold:start:MAKE"
   - make osrm-extract --jobs=3
   - make --jobs=${JOBS}
@@ -145,6 +153,7 @@ install:
       sudo ldconfig
     fi
   - popd
+  - pkg-config libosrm --debug
   - mkdir example/build && pushd example/build
   - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
   - make

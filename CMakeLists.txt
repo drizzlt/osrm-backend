@@ -350,14 +350,14 @@ if(ENABLE_MASON)
   message(STATUS "tbb: ${MASON_PACKAGE_tbb_LDFLAGS}")
   set(TBB_LIBRARIES ${MASON_PACKAGE_tbb_LDFLAGS})
 
-  add_dependency_includes("third_party/libosmium/include")
+  include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/third_party/libosmium/include)
 
 else()
 
   list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/third_party/libosmium/cmake")
   set(OSMIUM_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party/libosmium/include")
   find_package(Osmium REQUIRED COMPONENTS io)
-  add_dependency_includes(${OSMIUM_INCLUDE_DIR})
+  include_directories(SYSTEM ${OSMIUM_INCLUDE_DIR})
 
   find_package(Boost 1.49.0 REQUIRED COMPONENTS ${BOOST_COMPONENTS})
   add_dependency_includes(${Boost_INCLUDE_DIRS})

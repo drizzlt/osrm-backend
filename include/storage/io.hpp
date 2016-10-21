@@ -53,9 +53,9 @@ inline HSGRHeader readHSGRHeader(boost::filesystem::ifstream &input_stream)
 // Needs to be called after HSGRHeader() to get the correct offset in the stream
 template <typename NodeT, typename EdgeT>
 void readHSGR(boost::filesystem::ifstream &input_stream,
-              NodeT *node_buffer,
+              NodeT node_buffer[],
               std::uint32_t number_of_nodes,
-              EdgeT *edge_buffer,
+              EdgeT edge_buffer[],
               std::uint32_t number_of_edges)
 {
     input_stream.read(reinterpret_cast<char *>(node_buffer), number_of_nodes * sizeof(NodeT));
@@ -73,7 +73,7 @@ inline std::uint32_t readTimestampSize(boost::filesystem::ifstream &timestamp_in
 
 // Reads the timestamp in a file
 inline void readTimestamp(boost::filesystem::ifstream &timestamp_input_stream,
-                          char *timestamp,
+                          char timestamp[],
                           std::size_t timestamp_length)
 {
     timestamp_input_stream.read(timestamp, timestamp_length * sizeof(char));
@@ -112,14 +112,14 @@ template <typename GeometryIDT,
           typename PreTurnBearingT,
           typename PostTurnBearingT>
 void readEdgesData(boost::filesystem::ifstream &edges_input_stream,
-                   GeometryIDT *geometry_list,
-                   NameIDT *name_id_list,
-                   TurnInstructionT *turn_instruction_list,
-                   LaneDataIDT *lane_data_id_list,
-                   TravelModeT *travel_mode_list,
-                   EntryClassIDT *entry_class_id_list,
-                   PreTurnBearingT *pre_turn_bearing_list,
-                   PostTurnBearingT *post_turn_bearing_list,
+                   GeometryIDT geometry_list[],
+                   NameIDT name_id_list[],
+                   TurnInstructionT turn_instruction_list[],
+                   LaneDataIDT lane_data_id_list[],
+                   TravelModeT travel_mode_list[],
+                   EntryClassIDT entry_class_id_list[],
+                   PreTurnBearingT pre_turn_bearing_list[],
+                   PostTurnBearingT post_turn_bearing_list[],
                    std::uint32_t number_of_edges)
 {
     extractor::OriginalEdgeData current_edge_data;
@@ -150,7 +150,7 @@ inline std::uint32_t readNodesSize(boost::filesystem::ifstream &nodes_input_stre
 // Any ideas how to fix this?
 template <typename CoordinateT, typename OSMNodeIDVectorT>
 void readNodesData(boost::filesystem::ifstream &nodes_input_stream,
-                   CoordinateT *coordinate_list,
+                   CoordinateT coordinate_list[],
                    OSMNodeIDVectorT &osmnodeid_list,
                    std::uint32_t number_of_coordinates)
 {
@@ -158,12 +158,11 @@ void readNodesData(boost::filesystem::ifstream &nodes_input_stream,
     for (std::uint32_t i = 0; i < number_of_coordinates; ++i)
     {
         nodes_input_stream.read((char *)&current_node, sizeof(extractor::QueryNode));
-        coordinate_list[i] = util::Coordinate(current_node.lon, current_node.lat);
+        coordinate_list[i] = CoordinateT(current_node.lon, current_node.lat);
         osmnodeid_list.push_back(current_node.node_id);
         BOOST_ASSERT(coordinate_list[i].IsValid());
     }
 }
-
 }
 }
 }
